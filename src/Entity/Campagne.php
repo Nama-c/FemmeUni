@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Enum\StatutCampagne;
 use App\Repository\CampagneRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -43,9 +45,16 @@ abstract class Campagne
     #[ORM\JoinColumn(nullable: false)]
     protected ?Groupement $groupement = null;
 
+    /**
+     * @var Collection<int, Participation>
+     */
+    #[ORM\OneToMany(targetEntity: Participation::class, mappedBy: 'campagne')]
+    private Collection $participations;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
+        $this->participations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -145,6 +154,36 @@ abstract class Campagne
     public function setGroupement(?Groupement $groupement): static
     {
         $this->groupement = $groupement;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Participation>
+     */
+    public function getParticipations(): Collection
+    {
+        return $this->participations;
+    }
+
+    public function addParticipation(Participation $participation): static
+    {
+        if (!$this->participations->contains($participation)) {
+            $this->participations->add($participation);
+            $participation->setCampagne($this);
+        }
+
+        return $this;
+    }
+
+    public function removeParticipation(Participation $participation): static
+    {
+        if ($this->participations->removeElement($participation)) {
+            // set the owning side to null (unless already changed)
+            if ($participation->getCampagne() === $this) {
+                $participation->setCampagne(null);
+            }
+        }
 
         return $this;
     }
