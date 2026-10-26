@@ -2,35 +2,44 @@
 
 namespace App\Entity;
 
+use App\Enum\Fonction;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Table(name: '`user`')]
-class User
+#[ORM\Table(name: 'user')]
+#[ORM\InheritanceType('SINGLE_TABLE')]
+#[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
+#[ORM\DiscriminatorMap(['membre' => Membre::class, 'admin' => Admin::class])]
+abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    protected ?int $id = null;
 
     #[ORM\Column(length: 100)]
-    private ?string $nomComplet = null;
+    protected ?string $nomComplet = null;
 
     #[ORM\Column(length: 20)]
-    private ?string $tel = null;
+    protected ?string $tel = null;
 
     #[ORM\Column(length: 100)]
-    private ?string $adresse = null;
+    protected ?string $adresse = null;
 
-    #[ORM\Column(length: 100)]
-    private ?string $login = null;
+    #[ORM\Column(length: 100, unique: true)]
+    protected ?string $login = null;
 
-    #[ORM\Column(length: 100)]
-    private ?string $password = null;
+    #[ORM\Column(length: 255)]
+    protected ?string $password = null;
+
+    #[ORM\Column(enumType: Fonction::class, nullable: true)]
+    protected ?Fonction $fonction = null;
 
     #[ORM\ManyToOne(inversedBy: 'users')]
-    private ?Groupement $groupement = null;
+    protected ?Groupement $groupement = null;
 
     public function getId(): ?int
     {
@@ -97,6 +106,18 @@ class User
         return $this;
     }
 
+    public function getFonction(): ?Fonction
+    {
+        return $this->fonction;
+    }
+
+    public function setFonction(?Fonction $fonction): static
+    {
+        $this->fonction = $fonction;
+
+        return $this;
+    }
+
     public function getGroupement(): ?Groupement
     {
         return $this->groupement;
@@ -107,5 +128,19 @@ class User
         $this->groupement = $groupement;
 
         return $this;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->login;
+    }
+
+    public function getRoles(): array
+    {
+        return ['ROLE_USER'];
+    }
+
+    public function eraseCredentials(): void
+    {
     }
 }
