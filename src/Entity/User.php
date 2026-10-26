@@ -64,7 +64,7 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Pret>
      */
-    #[ORM\OneToMany(targetEntity: Pret::class, mappedBy: 'traiterpar')]
+    #[ORM\OneToMany(targetEntity: Pret::class, mappedBy: 'traitePar')]
     private Collection $pretsTraites;
 
     public function __construct()
@@ -280,7 +280,7 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->pretsTraites->contains($pretsTraite)) {
             $this->pretsTraites->add($pretsTraite);
-            $pretsTraite->setTraiterpar($this);
+            $pretsTraite->setTraitePar($this);
         }
 
         return $this;
@@ -290,8 +290,8 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->pretsTraites->removeElement($pretsTraite)) {
             // set the owning side to null (unless already changed)
-            if ($pretsTraite->getTraiterpar() === $this) {
-                $pretsTraite->setTraiterpar(null);
+            if ($pretsTraite->getTraitePar() === $this) {
+                $pretsTraite->setTraitePar(null);
             }
         }
 
