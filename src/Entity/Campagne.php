@@ -51,10 +51,17 @@ abstract class Campagne
     #[ORM\OneToMany(targetEntity: Participation::class, mappedBy: 'campagne')]
     private Collection $participations;
 
+    /**
+     * @var Collection<int, Versement>
+     */
+    #[ORM\OneToMany(targetEntity: Versement::class, mappedBy: 'Campagne')]
+    private Collection $versements;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->participations = new ArrayCollection();
+        $this->versements = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -182,6 +189,36 @@ abstract class Campagne
             // set the owning side to null (unless already changed)
             if ($participation->getCampagne() === $this) {
                 $participation->setCampagne(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Versement>
+     */
+    public function getVersements(): Collection
+    {
+        return $this->versements;
+    }
+
+    public function addVersement(Versement $versement): static
+    {
+        if (!$this->versements->contains($versement)) {
+            $this->versements->add($versement);
+            $versement->setCampagne($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVersement(Versement $versement): static
+    {
+        if ($this->versements->removeElement($versement)) {
+            // set the owning side to null (unless already changed)
+            if ($versement->getCampagne() === $this) {
+                $versement->setCampagne(null);
             }
         }
 

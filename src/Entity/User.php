@@ -49,9 +49,16 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Participation::class, mappedBy: 'utilisateur')]
     private Collection $participations;
 
+    /**
+     * @var Collection<int, Versement>
+     */
+    #[ORM\OneToMany(targetEntity: Versement::class, mappedBy: 'utilisateur')]
+    private Collection $versements;
+
     public function __construct()
     {
         $this->participations = new ArrayCollection();
+        $this->versements = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -181,6 +188,36 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($participation->getUtilisateur() === $this) {
                 $participation->setUtilisateur(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Versement>
+     */
+    public function getVersements(): Collection
+    {
+        return $this->versements;
+    }
+
+    public function addVersement(Versement $versement): static
+    {
+        if (!$this->versements->contains($versement)) {
+            $this->versements->add($versement);
+            $versement->setUtilisateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVersement(Versement $versement): static
+    {
+        if ($this->versements->removeElement($versement)) {
+            // set the owning side to null (unless already changed)
+            if ($versement->getUtilisateur() === $this) {
+                $versement->setUtilisateur(null);
             }
         }
 
