@@ -55,10 +55,24 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Versement::class, mappedBy: 'utilisateur')]
     private Collection $versements;
 
+    /**
+     * @var Collection<int, Pret>
+     */
+    #[ORM\OneToMany(targetEntity: Pret::class, mappedBy: 'emprunteur')]
+    private Collection $prets;
+
+    /**
+     * @var Collection<int, Pret>
+     */
+    #[ORM\OneToMany(targetEntity: Pret::class, mappedBy: 'traiterpar')]
+    private Collection $pretsTraites;
+
     public function __construct()
     {
         $this->participations = new ArrayCollection();
         $this->versements = new ArrayCollection();
+        $this->prets = new ArrayCollection();
+        $this->pretsTraites = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -218,6 +232,66 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($versement->getUtilisateur() === $this) {
                 $versement->setUtilisateur(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Pret>
+     */
+    public function getPrets(): Collection
+    {
+        return $this->prets;
+    }
+
+    public function addPret(Pret $pret): static
+    {
+        if (!$this->prets->contains($pret)) {
+            $this->prets->add($pret);
+            $pret->setEmprunteur($this);
+        }
+
+        return $this;
+    }
+
+    public function removePret(Pret $pret): static
+    {
+        if ($this->prets->removeElement($pret)) {
+            // set the owning side to null (unless already changed)
+            if ($pret->getEmprunteur() === $this) {
+                $pret->setEmprunteur(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Pret>
+     */
+    public function getPretsTraites(): Collection
+    {
+        return $this->pretsTraites;
+    }
+
+    public function addPretsTraite(Pret $pretsTraite): static
+    {
+        if (!$this->pretsTraites->contains($pretsTraite)) {
+            $this->pretsTraites->add($pretsTraite);
+            $pretsTraite->setTraiterpar($this);
+        }
+
+        return $this;
+    }
+
+    public function removePretsTraite(Pret $pretsTraite): static
+    {
+        if ($this->pretsTraites->removeElement($pretsTraite)) {
+            // set the owning side to null (unless already changed)
+            if ($pretsTraite->getTraiterpar() === $this) {
+                $pretsTraite->setTraiterpar(null);
             }
         }
 
