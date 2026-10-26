@@ -54,7 +54,7 @@ abstract class Campagne
     /**
      * @var Collection<int, Versement>
      */
-    #[ORM\OneToMany(targetEntity: Versement::class, mappedBy: 'Campagne')]
+    #[ORM\OneToMany(targetEntity: Versement::class, mappedBy: 'campagne')]
     private Collection $versements;
 
     public function __construct()
