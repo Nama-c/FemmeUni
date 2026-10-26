@@ -3,9 +3,11 @@
 namespace App\Entity;
 
 use App\Repository\ParticipationRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ParticipationRepository::class)]
+#[ORM\UniqueConstraint(name: 'uniq_utilisateur_campagne', columns: ['utilisateur_id', 'campagne_id'])]
 class Participation
 {
     #[ORM\Id]
@@ -13,8 +15,8 @@ class Participation
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private ?\DateTimeImmutable $dateAdhesionAt = null;
+    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    private ?\DateTimeImmutable $dateAdhesion = null;
 
     #[ORM\ManyToOne(inversedBy: 'participations')]
     #[ORM\JoinColumn(nullable: false)]
@@ -24,19 +26,24 @@ class Participation
     #[ORM\JoinColumn(nullable: false)]
     private ?Campagne $campagne = null;
 
+    public function __construct()
+    {
+        $this->dateAdhesion = new \DateTimeImmutable();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getDateAdhesionAt(): ?\DateTimeImmutable
+    public function getDateAdhesion(): ?\DateTimeImmutable
     {
-        return $this->dateAdhesionAt;
+        return $this->dateAdhesion;
     }
 
-    public function setDateAdhesionAt(\DateTimeImmutable $dateAdhesionAt): static
+    public function setDateAdhesion(\DateTimeImmutable $dateAdhesion): static
     {
-        $this->dateAdhesionAt = $dateAdhesionAt;
+        $this->dateAdhesion = $dateAdhesion;
 
         return $this;
     }
