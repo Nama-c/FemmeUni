@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\StatutPret;
 use App\Repository\PretRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -14,25 +15,45 @@ class Pret
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\Column]
+    private ?int $montant = null;
+
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     private ?\DateTimeImmutable $dateDemande = null;
 
-    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $dateEcheance = null;
 
-    #[ORM\Column]
-    private ?int $montant = null;
+    #[ORM\Column(enumType: StatutPret::class)]
+    private StatutPret $statut = StatutPret::EN_ATTENTE;
 
     #[ORM\ManyToOne(inversedBy: 'prets')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $emprunteur = null;
 
     #[ORM\ManyToOne(inversedBy: 'pretsTraites')]
-    private ?User $traiterpar = null;
+    private ?User $traitePar = null;
+
+    public function __construct()
+    {
+        $this->dateDemande = new \DateTimeImmutable();
+    }
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getMontant(): ?int
+    {
+        return $this->montant;
+    }
+
+    public function setMontant(int $montant): static
+    {
+        $this->montant = $montant;
+
+        return $this;
     }
 
     public function getDateDemande(): ?\DateTimeImmutable
@@ -52,21 +73,21 @@ class Pret
         return $this->dateEcheance;
     }
 
-    public function setDateEcheance(\DateTimeImmutable $dateEcheance): static
+    public function setDateEcheance(?\DateTimeImmutable $dateEcheance): static
     {
         $this->dateEcheance = $dateEcheance;
 
         return $this;
     }
 
-    public function getMontant(): ?int
+    public function getStatut(): StatutPret
     {
-        return $this->montant;
+        return $this->statut;
     }
 
-    public function setMontant(int $montant): static
+    public function setStatut(StatutPret $statut): static
     {
-        $this->montant = $montant;
+        $this->statut = $statut;
 
         return $this;
     }
@@ -83,14 +104,14 @@ class Pret
         return $this;
     }
 
-    public function getTraiterpar(): ?User
+    public function getTraitePar(): ?User
     {
-        return $this->traiterpar;
+        return $this->traitePar;
     }
 
-    public function setTraiterpar(?User $traiterpar): static
+    public function setTraitePar(?User $traitePar): static
     {
-        $this->traiterpar = $traiterpar;
+        $this->traitePar = $traitePar;
 
         return $this;
     }
