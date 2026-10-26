@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\VersementRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: VersementRepository::class)]
@@ -13,8 +14,8 @@ class Versement
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private ?\DateTimeImmutable $dateVersementAt = null;
+    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    private ?\DateTimeImmutable $dateVersement = null;
 
     #[ORM\Column]
     private ?int $montant = null;
@@ -25,21 +26,26 @@ class Versement
 
     #[ORM\ManyToOne(inversedBy: 'versements')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Campagne $Campagne = null;
+    private ?Campagne $campagne = null;
+
+    public function __construct()
+    {
+        $this->dateVersement = new \DateTimeImmutable();
+    }
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getDateVersementAt(): ?\DateTimeImmutable
+    public function getDateVersement(): ?\DateTimeImmutable
     {
-        return $this->dateVersementAt;
+        return $this->dateVersement;
     }
 
-    public function setDateVersementAt(\DateTimeImmutable $dateVersementAt): static
+    public function setDateVersement(\DateTimeImmutable $dateVersement): static
     {
-        $this->dateVersementAt = $dateVersementAt;
+        $this->dateVersement = $dateVersement;
 
         return $this;
     }
@@ -70,12 +76,12 @@ class Versement
 
     public function getCampagne(): ?Campagne
     {
-        return $this->Campagne;
+        return $this->campagne;
     }
 
-    public function setCampagne(?Campagne $Campagne): static
+    public function setCampagne(?Campagne $campagne): static
     {
-        $this->Campagne = $Campagne;
+        $this->campagne = $campagne;
 
         return $this;
     }
