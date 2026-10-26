@@ -2,38 +2,51 @@
 
 namespace App\Entity;
 
+use App\Enum\StatutCampagne;
 use App\Repository\CampagneRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CampagneRepository::class)]
-class Campagne
+#[ORM\InheritanceType('SINGLE_TABLE')]
+#[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
+#[ORM\DiscriminatorMap(['tontine' => Tontine::class, 'epargne' => Epargne::class])]
+abstract class Campagne
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    protected ?int $id = null;
 
     #[ORM\Column(length: 100)]
-    private ?string $nom = null;
+    protected ?string $nom = null;
 
-    #[ORM\Column]
-    private ?\DateTimeImmutable $dateDbAt = null;
+    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    protected ?\DateTimeImmutable $dateDebut = null;
 
-    #[ORM\Column]
-    private ?\DateTimeImmutable $dateFiinAt = null;
-
-    #[ORM\Column]
-    private ?int $montant = null;
-
-    #[ORM\Column]
-    private ?\DateTimeImmutable $creatAtAt = null;
+    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
+    protected ?\DateTimeImmutable $dateFin = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $updateAtAt = null;
+    protected ?int $montant = null;
+
+    #[ORM\Column(enumType: StatutCampagne::class)]
+    protected StatutCampagne $statut = StatutCampagne::OUVERTE;
+
+    #[ORM\Column]
+    protected ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column(nullable: true)]
+    protected ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'campagnes')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Groupement $groupement = null;
+    protected ?Groupement $groupement = null;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
+    }
 
     public function getId(): ?int
     {
@@ -52,26 +65,26 @@ class Campagne
         return $this;
     }
 
-    public function getDateDbAt(): ?\DateTimeImmutable
+    public function getDateDebut(): ?\DateTimeImmutable
     {
-        return $this->dateDbAt;
+        return $this->dateDebut;
     }
 
-    public function setDateDbAt(\DateTimeImmutable $dateDbAt): static
+    public function setDateDebut(\DateTimeImmutable $dateDebut): static
     {
-        $this->dateDbAt = $dateDbAt;
+        $this->dateDebut = $dateDebut;
 
         return $this;
     }
 
-    public function getDateFiinAt(): ?\DateTimeImmutable
+    public function getDateFin(): ?\DateTimeImmutable
     {
-        return $this->dateFiinAt;
+        return $this->dateFin;
     }
 
-    public function setDateFiinAt(\DateTimeImmutable $dateFiinAt): static
+    public function setDateFin(?\DateTimeImmutable $dateFin): static
     {
-        $this->dateFiinAt = $dateFiinAt;
+        $this->dateFin = $dateFin;
 
         return $this;
     }
@@ -81,33 +94,45 @@ class Campagne
         return $this->montant;
     }
 
-    public function setMontant(int $montant): static
+    public function setMontant(?int $montant): static
     {
         $this->montant = $montant;
 
         return $this;
     }
 
-    public function getCreatAtAt(): ?\DateTimeImmutable
+    public function getStatut(): StatutCampagne
     {
-        return $this->creatAtAt;
+        return $this->statut;
     }
 
-    public function setCreatAtAt(\DateTimeImmutable $creatAtAt): static
+    public function setStatut(StatutCampagne $statut): static
     {
-        $this->creatAtAt = $creatAtAt;
+        $this->statut = $statut;
 
         return $this;
     }
 
-    public function getUpdateAtAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?\DateTimeImmutable
     {
-        return $this->updateAtAt;
+        return $this->createdAt;
     }
 
-    public function setUpdateAtAt(?\DateTimeImmutable $updateAtAt): static
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
-        $this->updateAtAt = $updateAtAt;
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }
